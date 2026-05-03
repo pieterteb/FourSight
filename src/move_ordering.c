@@ -34,7 +34,7 @@ static void add_move(struct MoveOrder* restrict order, const Bitboard move, cons
 void compute_move_order(struct MoveOrder* restrict order, const struct Position position) {
     assert(order != NULL);
 
-    // Static order in which to search columns. From middle to sides.
+    // Static reversed order in which to search columns. From middle to sides.
     static const enum Column reverse_column_order[COLUMN_COUNT] = {COLUMN_1, COLUMN_7, COLUMN_2, COLUMN_6,
                                                                    COLUMN_3, COLUMN_5, COLUMN_4};
 
