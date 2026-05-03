@@ -88,4 +88,4 @@ Nodes per second:  10523.23 kN/s
 ```
 
 The score is positive if it is a win, negative if it is a loss, and 0 if it is a draw.
-The magnitude indicates how many tokens are left when the last move is played: 1 if the game is won/lost with the last token, 2 if the game is won/lost with the second to last token etc.
+Its magnitude indicates how many tokens are left when the last move is played: 1 if the game is won/lost with the last token, 2 if the game is won/lost with the second to last token etc.
