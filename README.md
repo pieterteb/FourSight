@@ -21,7 +21,7 @@ make
 
 ## Options
 
-FourSight supports three main modes:
+FourSight supports three commands:
 
 ### Help
 
