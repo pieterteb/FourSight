@@ -1,0 +1,35 @@
+BasedOnStyle: Google
+AlignArrayOfStructures: Right
+AlignConsecutiveAssignments: true
+AlignConsecutiveMacros: AcrossComments
+AlignOperands: AlignAfterOperator
+AllowShortBlocksOnASingleLine: Empty
+AllowShortEnumsOnASingleLine: false
+AllowShortFunctionsOnASingleLine: Empty
+AllowShortIfStatementsOnASingleLine: Never
+AllowShortLoopsOnASingleLine: false
+BinPackLongBracedList: true # clang-format 21+
+BreakBeforeBinaryOperators: NonAssignment
+ColumnLimit: 120
+ContinuationIndentWidth: 0
+EnumTrailingComma: Remove # clang-format 21+
+IncludeBlocks: Preserve
+IndentGotoLabels: false
+IndentPPDirectives: AfterHash
+IndentWidth: 4
+InsertNewlineAtEOF: true
+LineEnding: LF
+MaxEmptyLinesToKeep: 3
+# clang-format 22+
+# NumericLiteralCase:
+#   ExponentLetter: Upper
+#   HexDigit: Upper
+#   Prefix: Upper
+#   Suffix: Upper
+PenaltyBreakAssignment: 1000
+ReflowComments: Always
+RemoveEmptyLinesInUnwrappedLines: true
+RemoveParentheses: MultipleParentheses
+RemoveSemicolon: true
+TabWidth: 4
+UseTab: Never
