@@ -35,11 +35,6 @@ static Score search(const struct Position position, struct TranspositionTable tt
 
     ++*node_count;
 
-    if (*node_count % 100000000 == 0) {
-        print_position(position);
-        printf("alpha, beta: %d %d\n", alpha, beta);
-    }
-
     // If the max game length is reached, we have a draw since we checked that
     // the last move played was not a winning move.
     if (moves_played == MAX_GAME_LENGTH)
