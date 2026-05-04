@@ -130,8 +130,8 @@ static INLINE Bitboard non_losing_moves(const struct Position position) {
     if (forced != EMPTY_BITBOARD) {
         if ((forced & (forced - 1)) != EMPTY_BITBOARD)
             return EMPTY_BITBOARD;  // Everything loses if there are multiple forced moves.
-        else
-            possible = forced;
+
+        possible = forced;
     }
 
     // Playing below a threat loses the game.
