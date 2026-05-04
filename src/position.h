@@ -71,34 +71,50 @@ static INLINE Bitboard possible_moves(const struct Position position) {
 // is a threat if it forms a connect 4 when filled.
 static INLINE Bitboard compute_threats(const Bitboard occupancy) {
     // Vertical.
-    Bitboard threats = (occupancy << 1) & (occupancy << 2) & (occupancy << 3);
+    unsigned shift         = 1;
+    Bitboard shifted_left1 = occupancy << 1;
+    Bitboard shifted_left2 = occupancy << 2;
+    Bitboard shifted_left3 = occupancy << 3;
+    Bitboard threats       = shifted_left1 & shifted_left2 & shifted_left3;
 
     // Horizontal.
-    const unsigned horizontal_shift = COLUMN_HEIGHT;
-    Bitboard mask                   = (occupancy << horizontal_shift) & (occupancy << (2 * horizontal_shift));
-    threats |= mask & (occupancy << (3 * horizontal_shift));
-    threats |= mask & (occupancy >> horizontal_shift);
-    mask >>= 3 * horizontal_shift;
-    threats |= mask & (occupancy << horizontal_shift);
-    threats |= mask & (occupancy >> (3 * horizontal_shift));
+    shift                   = COLUMN_HEIGHT;
+    shifted_left1           = occupancy << shift;
+    shifted_left2           = occupancy << (2 * shift);
+    shifted_left3           = occupancy << (3 * shift);
+    Bitboard shifted_right1 = occupancy >> shift;
+    Bitboard shifted_right3 = occupancy >> (3 * shift);
+    Bitboard mask           = shifted_left1 & shifted_left2;
+    Bitboard threat12       = mask & (shifted_left3 | shifted_right1);
+    mask >>= 3 * shift;
+    Bitboard threat34 = mask & (shifted_left1 | shifted_right3);
+    threats |= threat12 | threat34;
 
     // Diagonal /.
-    const unsigned diagonal_shift = COLUMN_HEIGHT + 1;
-    mask                          = (occupancy << diagonal_shift) & (occupancy << (2 * diagonal_shift));
-    threats |= mask & (occupancy << (3 * diagonal_shift));
-    threats |= mask & (occupancy >> diagonal_shift);
-    mask >>= 3 * diagonal_shift;
-    threats |= mask & (occupancy << diagonal_shift);
-    threats |= mask & (occupancy >> (3 * diagonal_shift));
+    shift          = COLUMN_HEIGHT + 1;
+    shifted_left1  = occupancy << shift;
+    shifted_left2  = occupancy << (2 * shift);
+    shifted_left3  = occupancy << (3 * shift);
+    shifted_right1 = occupancy >> shift;
+    shifted_right3 = occupancy >> (3 * shift);
+    mask           = shifted_left1 & shifted_left2;
+    threat12       = mask & (shifted_left3 | shifted_right1);
+    mask >>= 3 * shift;
+    threat34 = mask & (shifted_left1 | shifted_right3);
+    threats |= threat12 | threat34;
 
     // Anti-diagonal \.
-    const unsigned antidiagonal_shift = COLUMN_HEIGHT - 1;
-    mask                              = (occupancy << antidiagonal_shift) & (occupancy << (2 * antidiagonal_shift));
-    threats |= mask & (occupancy << (3 * antidiagonal_shift));
-    threats |= mask & (occupancy >> antidiagonal_shift);
-    mask >>= 3 * antidiagonal_shift;
-    threats |= mask & (occupancy << antidiagonal_shift);
-    threats |= mask & (occupancy >> (3 * antidiagonal_shift));
+    shift          = COLUMN_HEIGHT - 1;
+    shifted_left1  = occupancy << shift;
+    shifted_left2  = occupancy << (2 * shift);
+    shifted_left3  = occupancy << (3 * shift);
+    shifted_right1 = occupancy >> shift;
+    shifted_right3 = occupancy >> (3 * shift);
+    mask           = shifted_left1 & shifted_left2;
+    threat12       = mask & (shifted_left3 | shifted_right1);
+    mask >>= 3 * shift;
+    threat34 = mask & (shifted_left1 | shifted_right3);
+    threats |= threat12 | threat34;
 
     return threats & BOARD_MASK;
 }
