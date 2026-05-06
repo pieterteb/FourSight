@@ -9,7 +9,7 @@ Assuming perfect play from the opponent:
 The goal of FourSight is not to solve the entire game at once, but to solve individual positions as quickly as possible.
 Every position is solved from scratch: no precomputed solutions or opening books are used.
 
-Currently, FourSight can solve the start position in a little under 4 minutes.
+Currently, FourSight can solve the start position in a little under 3 minutes.
 
 ## Installation
 
@@ -58,7 +58,7 @@ Runs performance tests using predefined positions:
 ## Example
 
 ```bash
-./src/foursight 2531276566711153
+./foursight 2531276566711153
 ```
 
 Output:
@@ -82,9 +82,9 @@ To move:    Red
 
 Best move:         7
 Score:             2
-Time:              0.022132 s
+Time:              0.015540 s
 Nodes searched:    232905
-Nodes per second:  10523.23 kN/s
+Nodes per second:  14987.61 kN/s
 ```
 
 The score is positive if it is a win, negative if it is a loss, and 0 if it is a draw.
