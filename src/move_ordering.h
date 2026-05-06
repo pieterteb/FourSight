@@ -9,18 +9,25 @@
 
 #include "bitboard.h"
 #include "position.h"
+#include "simd.h"
 #include "util.h"
 
 
 
+#if HAS_AVX512
+
+typedef Bitboard MoveScore;
+
+#else
+
 typedef unsigned MoveScore;
+
+#endif  // #if HAS_AVX512
 
 
 struct MoveOrder {
-    struct {
-        Bitboard move;
-        MoveScore score;
-    } entries[COLUMN_COUNT];
+    Bitboard moves[COLUMN_COUNT];
+    MoveScore scores[COLUMN_COUNT];
 
     size_t move_count;
 };
@@ -35,7 +42,7 @@ void compute_move_order(struct MoveOrder* restrict order, const struct Position 
 // an empty bitboard.
 static INLINE Bitboard next_move(struct MoveOrder* restrict order) {
     if (order->move_count != 0)
-        return order->entries[--order->move_count].move;
+        return order->moves[--order->move_count];
 
     return EMPTY_BITBOARD;
 }

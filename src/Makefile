@@ -1,8 +1,8 @@
 # Compiler and flags
 CC      := clang
-BASE    := -std=c11 -fdiagnostics-color=always -Werror -Wpedantic -Wall -Wextra -Wdouble-promotion -Wformat=2 -Wformat-signedness -Wnull-dereference -Winit-self -Wmissing-include-dirs -Wunused -Wuninitialized -Wstrict-overflow=2 -Wzero-as-null-pointer-constant -Wshadow -Wundef -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wstrict-prototypes -Wpacked -Wredundant-decls -Wnested-externs -Winline -Winvalid-utf8 -D_GNU_SOURCE
+BASE    := -std=c11 -fdiagnostics-color=always -Werror -Wpedantic -Wall -Wextra -Wdouble-promotion -Wformat=2 -Wformat-signedness -Wnull-dereference -Winit-self -Wmissing-include-dirs -Wunused -Wuninitialized -Wstrict-overflow=2 -Wzero-as-null-pointer-constant -Wshadow -Wundef -Wbad-function-cast -Wcast-qual -Wcast-align -Wwrite-strings -Wconversion -Wstrict-prototypes -Wpacked -Wredundant-decls -Wnested-externs -Winline -Winvalid-utf8 -D_GNU_SOURCE -march=native
 DEBUG   := -g -O0 -fsanitize=address -fstack-protector-all
-RELEASE := -O3 -march=native -flto -fno-stack-protector -DNDEBUG
+RELEASE := -O3 -flto -fno-stack-protector -DNDEBUG
 
 # Sources, objects, target
 SRC     := main.c benchmark.c bitboard.c move_ordering.c position.c search.c transposition_table.c

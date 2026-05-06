@@ -10,6 +10,7 @@
 #include <stddef.h>
 
 #include "bitboard.h"
+#include "simd.h"
 #include "util.h"
 
 
@@ -72,9 +73,9 @@ static INLINE Bitboard possible_moves(const struct Position position) {
 static INLINE Bitboard compute_threats(const Bitboard occupancy) {
     // Vertical.
     unsigned shift         = 1;
-    Bitboard shifted_left1 = occupancy << 1;
-    Bitboard shifted_left2 = occupancy << 2;
-    Bitboard shifted_left3 = occupancy << 3;
+    Bitboard shifted_left1 = occupancy << shift;
+    Bitboard shifted_left2 = occupancy << (2 * shift);
+    Bitboard shifted_left3 = occupancy << (3 * shift);
     Bitboard threats       = shifted_left1 & shifted_left2 & shifted_left3;
 
     // Horizontal.
@@ -118,6 +119,71 @@ static INLINE Bitboard compute_threats(const Bitboard occupancy) {
 
     return threats & BOARD_MASK;
 }
+
+#if HAS_AVX512
+
+// Same as `compute_threats()`, but on a whole vector in parallel.
+static INLINE vec_8x64 compute_threats_vector(const vec_8x64 occupancy) {
+    // Vertical.
+    unsigned shift         = 1;
+    vec_8x64 shifted_left1 = vec_slli_8x64(occupancy, shift);
+    vec_8x64 shifted_left2 = vec_slli_8x64(occupancy, 2 * shift);
+    vec_8x64 shifted_left3 = vec_slli_8x64(occupancy, 3 * shift);
+    // shifted_left1 & shifted_left2 & shifted_left3
+    vec_8x64 threats = vec_ternarylogic_8x64(shifted_left1, shifted_left2, shifted_left3, 0x80);
+
+    // Horizontal.
+    shift                   = COLUMN_HEIGHT;
+    shifted_left1           = vec_slli_8x64(occupancy, shift);
+    shifted_left2           = vec_slli_8x64(occupancy, 2 * shift);
+    shifted_left3           = vec_slli_8x64(occupancy, 3 * shift);
+    vec_8x64 shifted_right1 = vec_srli_8x64(occupancy, shift);
+    vec_8x64 shifted_right3 = vec_srli_8x64(occupancy, 3 * shift);
+    vec_8x64 mask           = vec_and_8x64(shifted_left1, shifted_left2);
+    // mask & (shifted_left3 | shifted_right1)
+    vec_8x64 threat12 = vec_ternarylogic_8x64(mask, shifted_left3, shifted_right1, 0xE0);
+    mask              = vec_srli_8x64(mask, 3 * shift);
+    // mask & (shifted_left1 | shifted_right3)
+    vec_8x64 threat34 = vec_ternarylogic_8x64(mask, shifted_left1, shifted_right3, 0xE0);
+    // threats | threat12 | threat32
+    threats = vec_ternarylogic_8x64(threats, threat12, threat34, 0xFE);
+
+    // Diagonal /.
+    shift          = COLUMN_HEIGHT + 1;
+    shifted_left1  = vec_slli_8x64(occupancy, shift);
+    shifted_left2  = vec_slli_8x64(occupancy, 2 * shift);
+    shifted_left3  = vec_slli_8x64(occupancy, 3 * shift);
+    shifted_right1 = vec_srli_8x64(occupancy, shift);
+    shifted_right3 = vec_srli_8x64(occupancy, 3 * shift);
+    mask           = vec_and_8x64(shifted_left1, shifted_left2);
+    // mask & (shifted_left3 | shifted_right1)
+    threat12 = vec_ternarylogic_8x64(mask, shifted_left3, shifted_right1, 0xE0);
+    mask     = vec_srli_8x64(mask, 3 * shift);
+    // mask & (shifted_left1 | shifted_right3)
+    threat34 = vec_ternarylogic_8x64(mask, shifted_left1, shifted_right3, 0xE0);
+    // threats | threat12 | threat32
+    threats = vec_ternarylogic_8x64(threats, threat12, threat34, 0xFE);
+
+    // Anti-diagonal \.
+    shift          = COLUMN_HEIGHT - 1;
+    shifted_left1  = vec_slli_8x64(occupancy, shift);
+    shifted_left2  = vec_slli_8x64(occupancy, 2 * shift);
+    shifted_left3  = vec_slli_8x64(occupancy, 3 * shift);
+    shifted_right1 = vec_srli_8x64(occupancy, shift);
+    shifted_right3 = vec_srli_8x64(occupancy, 3 * shift);
+    mask           = vec_and_8x64(shifted_left1, shifted_left2);
+    // mask & (shifted_left3 | shifted_right1)
+    threat12 = vec_ternarylogic_8x64(mask, shifted_left3, shifted_right1, 0xE0);
+    mask     = vec_srli_8x64(mask, 3 * shift);
+    // mask & (shifted_left1 | shifted_right3)
+    threat34 = vec_ternarylogic_8x64(mask, shifted_left1, shifted_right3, 0xE0);
+    // threats | threat12 | threat32
+    threats = vec_ternarylogic_8x64(threats, threat12, threat34, 0xFE);
+
+    return vec_and_8x64(threats, vec_set1_8x64(BOARD_MASK));
+}
+
+#endif  // #if HAS_AVX512
 
 // Computes a bitboard of moves that do not immediately lose in `position`.
 // This function assumes that the current player does not have an immediate

@@ -116,6 +116,8 @@ static Score root_search(const struct Position position, struct TranspositionTab
             return beta;
     }
 
+
+
     struct MoveOrder order;
     compute_move_order(&order, position);
 
@@ -155,6 +157,8 @@ Score solve(const struct Position position, struct TranspositionTable tt, enum C
 
     Score max = win_score(moves);
     Score min = -max;
+
+
 
     while (min < max) {
         Score mid = min + (max - min) / 2;
